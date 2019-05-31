@@ -1,0 +1,44 @@
+{
+  "name": "oqa",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "scripts": {
+    "build": "npm run build:es && npm run build:lib",
+    "build:lib": "tsc --build tsconfig.json",
+    "build:es": "tsc --build tsconfig.es.json",
+    "lint": "tslint --project . -c tslint.yml"
+  },
+  "author": {
+    "name": "imhele",
+    "email": "work@imhele.com",
+    "url": "https://github.com/imhele"
+  },
+  "files": [
+    "es",
+    "lib"
+  ],
+  "homepage": "https://github.com/alitajs/offline-qrcode-authentication",
+  "bugs": {
+    "url": "https://github.com/imhele/imhele/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alitajs/offline-qrcode-authentication"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint --fix",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "crypto-js": "~3.1.9-1"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "~3.1.43",
+    "tslint": "~5.16.0",
+    "tslint-eslint-rules": "~5.4.0",
+    "typescript": "~3.5.1"
+  }
+}
