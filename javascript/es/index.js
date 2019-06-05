@@ -1,6 +1,6 @@
 import sign, { makeHash, mergeConfig } from './sign';
 export { sign as encode };
-export const defaultCharMap = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/';
+export const defaultCharMap = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_';
 export function changeRadix(message, config = {}) {
   const { fromCharMap = defaultCharMap, toCharMap = defaultCharMap } = config;
   const radix = config.radix || toCharMap.length;
@@ -21,6 +21,9 @@ export function changeRadix(message, config = {}) {
   if (isNegative) res.unshift('-');
   return res.join('');
 }
+/**
+ * decode timestamp shot
+ */
 function decodeTSShot(tsShotStr, expiresIn, now) {
   const tsShot = parseInt(tsShotStr, 10);
   const tsMax = Math.pow(10, tsShotStr.length);

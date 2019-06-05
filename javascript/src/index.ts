@@ -3,12 +3,12 @@ import sign, { makeHash, mergeConfig, SignConfig, SignDigitsConfig } from './sig
 export { sign as encode, SignConfig, SignDigitsConfig };
 
 export const defaultCharMap: string =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/';
+  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_';
 
 export interface ChangeRadixConfig {
   /**
    * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
    */
   fromCharMap?: string;
   /**
@@ -18,7 +18,7 @@ export interface ChangeRadixConfig {
   radix?: number;
   /**
    * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
    */
   toCharMap?: string;
 }
@@ -44,6 +44,9 @@ export function changeRadix(message: number | string, config: ChangeRadixConfig 
   return res.join('');
 }
 
+/**
+ * decode timestamp shot
+ */
 function decodeTSShot(tsShotStr: string, expiresIn: number, now: number): number | null {
   const tsShot = parseInt(tsShotStr, 10);
   const tsMax = Math.pow(10, tsShotStr.length);
@@ -96,6 +99,9 @@ export type FindOneConfig<
    * 60
    */
   expiresIn?: number;
+  /**
+   * Search user info by `id`
+   */
   search: F;
 };
 

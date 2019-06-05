@@ -4,7 +4,7 @@ export declare const defaultCharMap: string;
 export interface ChangeRadixConfig {
   /**
    * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
    */
   fromCharMap?: string;
   /**
@@ -14,7 +14,7 @@ export interface ChangeRadixConfig {
   radix?: number;
   /**
    * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
    */
   toCharMap?: string;
 }
@@ -50,6 +50,9 @@ export declare type FindOneConfig<
    * 60
    */
   expiresIn?: number;
+  /**
+   * Search user info by `id`
+   */
   search: F;
 };
 export declare function findOne<
