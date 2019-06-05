@@ -6,8 +6,9 @@
   "scripts": {
     "build": "npm run build:es && npm run build:lib",
     "build:lib": "tsc --build tsconfig.json",
-    "build:es": "tsc --build tsconfig.es.json",
-    "lint": "tslint --project . -c tslint.yml"
+    "build:es": "tsc --build tsconfig.es.json && npm run prettier",
+    "lint": "tslint --project . -c tslint.yml",
+    "prettier": "prettier ./es/**/* --write"
   },
   "author": {
     "name": "imhele",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "~3.1.43",
+    "prettier": "~1.17.1",
     "tslint": "~5.16.0",
     "tslint-eslint-rules": "~5.4.0",
     "typescript": "~3.5.1"
