@@ -2,6 +2,16 @@
 
 离线二维码认证。
 
+## 使用
+
+### javascript
+
+```bash
+$ npm install oqa --save
+or
+$ yarn add oqa
+```
+
 ## 原理
 
 用户端定期更新 token ，根据用户 id 、 token 与当前时间戳生成指定长度的签名，服务端可根据签名找到签名所对应的用户。
