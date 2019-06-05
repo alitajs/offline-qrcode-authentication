@@ -18,6 +18,7 @@ export interface SignDigitsConfig {
 export interface SignConfig {
   /**
    * The number of digits of the encrypted output.
+   * Minimum is `2`.
    * @example
    * const id = 12345678;
    * const checkCode = 1234;
@@ -41,14 +42,47 @@ export interface SignConfig {
    */
   hmac?: boolean;
   /**
+   * Must be a decimal integer.
    * Eg: user id.
    */
-  id: number;
+  id: number | string;
   /**
    * Get tokens when networking.
    * Regular updates are recommended.
    */
   token: number | string;
 }
+export declare function mergeConfig(
+  config: Partial<SignConfig>,
+): {
+  digits:
+    | {
+        checkCode: number;
+        id: number;
+        timestamp: number;
+      }
+    | {
+        checkCode: number;
+        id: number;
+        timestamp: number;
+      };
+  hash:
+    | 'MD5'
+    | 'SHA1'
+    | 'SHA256'
+    | 'SHA512'
+    | ((msg: string, token?: string | undefined) => string);
+  hmac: boolean;
+  id?: string | number | undefined;
+  token?: string | number | undefined;
+};
+export declare function makeHash(
+  id: number | string,
+  token: number | string,
+  timestamp: number,
+  hash: Exclude<SignConfig['hash'], undefined>,
+  hmac: boolean,
+  checkCodeDigit: number,
+): string;
 declare const _default: (config: SignConfig) => string;
 export default _default;

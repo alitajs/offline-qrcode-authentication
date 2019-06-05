@@ -28,6 +28,7 @@ export interface SignDigitsConfig {
 export interface SignConfig {
   /**
    * The number of digits of the encrypted output.
+   * Minimum is `2`.
    * @example
    * const id = 12345678;
    * const checkCode = 1234;
@@ -51,9 +52,10 @@ export interface SignConfig {
    */
   hmac?: boolean;
   /**
+   * Must be a decimal integer.
    * Eg: user id.
    */
-  id: number;
+  id: number | string;
   /**
    * Get tokens when networking.
    * Regular updates are recommended.
@@ -67,22 +69,29 @@ function padStart(str: string, length: number, fill: string): string {
 }
 
 function formatDigits(
-  id: number,
-  checkCode: number,
+  id: number | string,
+  checkCode: string,
   timestamp: number,
   digits: SignDigitsConfig,
 ): string {
-  const { checkCode: dc = 4, id: di = 8, timestamp: dt = 6 } = digits;
+  const { id: di = 8, timestamp: dt = 6 } = digits;
   const timestampMax = Math.pow(10, dt);
   timestamp = (timestamp / 1000) % timestampMax;
   if (timestamp < timestampMax / 10) timestamp += timestampMax / 2;
   timestamp = Math.floor(timestamp);
-  return `${timestamp}${padStart(`${id}`, di, '0')}${padStart(`${checkCode}`, dc, '0')}`;
+  return `${timestamp}${padStart(`${id}`, di, '0')}${checkCode}`;
 }
 
-function mergeConfig(config: SignConfig): Required<SignConfig> {
+export function mergeConfig(config: Partial<SignConfig>) {
+  if (typeof config.id === 'string' && config.id.search(/\D/) !== -1)
+    throw new Error('`id` must be a decimal integer');
+  if (config.digits) {
+    const { checkCode: dc = 4, id: di = 8, timestamp: dt = 6 } = config.digits;
+    if (dc < 3 || di < 3 || dt < 3 || dc % 1 || di % 1 || dt % 1)
+      throw new Error('Value of `digits` must be an integer greater than 2');
+  }
   return {
-    hash: 'MD5',
+    hash: 'MD5' as const,
     hmac: true,
     ...config,
     digits: {
@@ -94,34 +103,42 @@ function mergeConfig(config: SignConfig): Required<SignConfig> {
   };
 }
 
-function makeHash(
+export function makeHash(
+  id: number | string,
+  token: number | string,
+  timestamp: number,
   hash: Exclude<SignConfig['hash'], undefined>,
   hmac: boolean,
-  id: number,
-  token: string | number,
-  timestamp: number,
+  checkCodeDigit: number,
 ): string {
+  let hashRes: string;
   const [message, key] = hmac
     ? [`${id}${timestamp}`, `${token}`]
     : [`${id}${timestamp}${token}`, undefined];
   switch (hash) {
     case 'MD5':
-      return `${hmac ? HmacMD5(message, key) : MD5(message)}`;
+      hashRes = `${hmac ? HmacMD5(message, key) : MD5(message)}`;
+      break;
     case 'SHA1':
-      return `${hmac ? HmacSHA1(message, key) : SHA1(message)}`;
+      hashRes = `${hmac ? HmacSHA1(message, key) : SHA1(message)}`;
+      break;
     case 'SHA256':
-      return `${hmac ? HmacSHA256(message, key) : SHA256(message)}`;
+      hashRes = `${hmac ? HmacSHA256(message, key) : SHA256(message)}`;
+      break;
     case 'SHA512':
-      return `${hmac ? HmacSHA512(message, key) : SHA512(message)}`;
+      hashRes = `${hmac ? HmacSHA512(message, key) : SHA512(message)}`;
+      break;
     default:
-      return hash(message, key);
+      hashRes = hash(message, key);
+      break;
   }
+  return padStart(`${parseInt(hashRes.slice(0, checkCodeDigit), 16)}`, checkCodeDigit, '0');
 }
 
 export default (config: SignConfig): string => {
   const { digits, hash, hmac, id, token } = mergeConfig(config);
+  if (!id || !token) throw new Error('`id` and `token` is required');
   const timestamp = Date.now();
-  const hashRes: string = makeHash(hash, hmac, id, token, timestamp);
-  const checkCode = parseInt(hashRes.slice(0, digits.checkCode), 16);
+  const checkCode = makeHash(id, token, timestamp, hash, hmac, digits.checkCode);
   return formatDigits(id, checkCode, timestamp, digits);
 };
