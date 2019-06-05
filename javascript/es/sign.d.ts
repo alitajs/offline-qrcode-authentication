@@ -52,6 +52,25 @@ export interface SignConfig {
    */
   token: number | string;
 }
+export declare const defaultCharMap: string;
+export interface ChangeRadixConfig {
+  /**
+   * @default
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
+   */
+  fromCharMap?: string;
+  /**
+   * @default
+   * toCharMap.length
+   */
+  radix?: number;
+  /**
+   * @default
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
+   */
+  toCharMap?: string;
+}
+export declare function changeRadix(message: number | string, config?: ChangeRadixConfig): string;
 export declare function mergeConfig(
   config: Partial<SignConfig>,
 ): {

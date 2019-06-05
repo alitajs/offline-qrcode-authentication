@@ -1,48 +1,13 @@
-import sign, { makeHash, mergeConfig, SignConfig, SignDigitsConfig } from './sign';
+import sign, {
+  changeRadix,
+  ChangeRadixConfig,
+  makeHash,
+  mergeConfig,
+  SignConfig,
+  SignDigitsConfig,
+} from './sign';
 
-export { sign as encode, SignConfig, SignDigitsConfig };
-
-export const defaultCharMap: string =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_';
-
-export interface ChangeRadixConfig {
-  /**
-   * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
-   */
-  fromCharMap?: string;
-  /**
-   * @default
-   * toCharMap.length
-   */
-  radix?: number;
-  /**
-   * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
-   */
-  toCharMap?: string;
-}
-
-export function changeRadix(message: number | string, config: ChangeRadixConfig = {}): string {
-  const { fromCharMap = defaultCharMap, toCharMap = defaultCharMap } = config;
-  const radix = config.radix || toCharMap.length;
-  const digits: number[] = [];
-  let isNegative: string | false = false;
-  if (typeof message === 'number') message = `${message}`;
-  if (message[0] === '-') isNegative = message = message.slice(1);
-  message.split('').forEach((char: string) => {
-    let num = fromCharMap.indexOf(char);
-    for (let i = 0; num || i < digits.length; i++) {
-      num += (digits[i] || 0) * 10;
-      digits[i] = num % radix;
-      num = (num - digits[i]) / radix;
-    }
-  });
-  const res = digits.reverse().map(num => toCharMap[num || 0]);
-  if (!res.length) res.push(toCharMap[0]);
-  if (isNegative) res.unshift('-');
-  return res.join('');
-}
+export { changeRadix, ChangeRadixConfig, sign as encode, SignConfig, SignDigitsConfig };
 
 /**
  * decode timestamp shot

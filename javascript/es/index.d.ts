@@ -1,24 +1,5 @@
-import sign, { SignConfig, SignDigitsConfig } from './sign';
-export { sign as encode, SignConfig, SignDigitsConfig };
-export declare const defaultCharMap: string;
-export interface ChangeRadixConfig {
-  /**
-   * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
-   */
-  fromCharMap?: string;
-  /**
-   * @default
-   * toCharMap.length
-   */
-  radix?: number;
-  /**
-   * @default
-   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
-   */
-  toCharMap?: string;
-}
-export declare function changeRadix(message: number | string, config?: ChangeRadixConfig): string;
+import sign, { changeRadix, ChangeRadixConfig, SignConfig, SignDigitsConfig } from './sign';
+export { changeRadix, ChangeRadixConfig, sign as encode, SignConfig, SignDigitsConfig };
 export declare function decode(
   message: string,
   expiresIn: number,

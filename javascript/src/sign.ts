@@ -68,6 +68,48 @@ function padStart(str: string, length: number, fill: string): string {
   return str.slice(str.length - length);
 }
 
+export const defaultCharMap: string =
+  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_';
+
+export interface ChangeRadixConfig {
+  /**
+   * @default
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
+   */
+  fromCharMap?: string;
+  /**
+   * @default
+   * toCharMap.length
+   */
+  radix?: number;
+  /**
+   * @default
+   * '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+_'
+   */
+  toCharMap?: string;
+}
+
+export function changeRadix(message: number | string, config: ChangeRadixConfig = {}): string {
+  const { fromCharMap = defaultCharMap, toCharMap = defaultCharMap } = config;
+  const radix = config.radix || toCharMap.length;
+  const digits: number[] = [];
+  let isNegative: string | false = false;
+  if (typeof message === 'number') message = `${message}`;
+  if (message[0] === '-') isNegative = message = message.slice(1);
+  message.split('').forEach((char: string) => {
+    let num = fromCharMap.indexOf(char);
+    for (let i = 0; num || i < digits.length; i++) {
+      num += (digits[i] || 0) * 10;
+      digits[i] = num % radix;
+      num = (num - digits[i]) / radix;
+    }
+  });
+  const res = digits.reverse().map(num => toCharMap[num || 0]);
+  if (!res.length) res.push(toCharMap[0]);
+  if (isNegative) res.unshift('-');
+  return res.join('');
+}
+
 function formatDigits(
   id: number | string,
   checkCode: string,
@@ -76,7 +118,7 @@ function formatDigits(
 ): string {
   const { id: di = 8, timestamp: dt = 6 } = digits;
   const timestampMax = Math.pow(10, dt);
-  timestamp = (timestamp / 1000) % timestampMax;
+  timestamp = timestamp % timestampMax;
   if (timestamp < timestampMax / 10) timestamp += timestampMax / 2;
   timestamp = Math.floor(timestamp);
   return `${timestamp}${padStart(`${id}`, di, '0')}${checkCode}`;
@@ -132,13 +174,14 @@ export function makeHash(
       hashRes = hash(message, key);
       break;
   }
-  return padStart(`${parseInt(hashRes.slice(0, checkCodeDigit), 16)}`, checkCodeDigit, '0');
+  hashRes = hashRes.slice(0, checkCodeDigit).toLowerCase();
+  return padStart(`${changeRadix(hashRes, { radix: 10 })}`, checkCodeDigit, '0');
 }
 
 export default (config: SignConfig): string => {
   const { digits, hash, hmac, id, token } = mergeConfig(config);
   if (!id || !token) throw new Error('`id` and `token` is required');
-  const timestamp = Date.now();
+  const timestamp = Math.floor(Date.now() / 1000);
   const checkCode = makeHash(id, token, timestamp, hash, hmac, digits.checkCode);
   return formatDigits(id, checkCode, timestamp, digits);
 };
