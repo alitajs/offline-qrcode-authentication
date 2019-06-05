@@ -56,3 +56,4 @@ export declare function findOne<
   T extends FindOneReturn,
   F extends (id: T['id']) => null | T | T[] | Promise<null | T | T[]>
 >(message: string, config: FindOneConfig<T, F>): null | T | Promise<null | T>;
+export default findOne;

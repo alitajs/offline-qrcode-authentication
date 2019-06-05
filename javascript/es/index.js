@@ -86,3 +86,4 @@ export function findOne(message, config) {
   // return `null` by default
   return null;
 }
+export default findOne;
